@@ -1,0 +1,39 @@
+{
+  "name": "contestorganizer-api",
+  "version": "1.0.0",
+  "description": "The api to make the Contest Organizer connected",
+  "main": "index.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "remove_rep": "rm -rf /var/www/marius.click/html/contest/api",
+    "create_rep": "mkdir /var/www/marius.click/html/contest/api",
+    "copie_files": "npm run copie_index && npm run copie_config && npm run copie_models && npm run copie_controllers && npm run copie_utils",
+    "copie_index": "cp index.php /var/www/marius.click/html/contest/api/",
+    "copie_config": "cp -r config /var/www/marius.click/html/contest/api/",
+    "copie_models": "cp -r models /var/www/marius.click/html/contest/api/",
+    "copie_controllers": "cp -r controllers /var/www/marius.click/html/contest/api/",
+    "copie_utils": "cp -r utils /var/www/marius.click/html/contest/api/",
+    "prod": "npm run remove_rep && npm run create_rep && npm run copie_files"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MadMartigane/ContestOrganizer-API.git"
+  },
+  "keywords": [
+    "Contest",
+    "organizer",
+    "tournament",
+    "match",
+    "basket",
+    "basketbal",
+    "soccer",
+    "footbal",
+    "rugby"
+  ],
+  "author": "Mad Martigane",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MadMartigane/ContestOrganizer-API/issues"
+  },
+  "homepage": "https://github.com/MadMartigane/ContestOrganizer-API#readme"
+}
