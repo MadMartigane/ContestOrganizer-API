@@ -2,10 +2,16 @@
 
 define("PROJECT_ROOT_PATH", __DIR__ . "/");
 
+// REQUIRES
+require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
+
 require_once "utils/common.php";
 use utils\common\sanitizeArgument;
 
+// CONSTANTS
 
+
+// VARIABLES
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $uri = explode( '/', $uri );
@@ -41,8 +47,6 @@ foreach ($uri as &$value) {
 }
 
 
-require PROJECT_ROOT_PATH . "controllers/common.php";
-
 $data = (object) [
     "action" => $requestAction,
     "subject" => $requestSubject,
@@ -50,8 +54,9 @@ $data = (object) [
     "uri" => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
 ];
 
-$ctrl = new CommonController();
-$ctrl->sendOutput(json_encode($data), array("Content-Type: application/json"));
+$procedures = new Procedures();
+$ok = $procedures->ok($data);
+$ok->print();
 
 ?>
 
