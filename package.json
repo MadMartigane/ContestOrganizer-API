@@ -2,8 +2,10 @@
   "name": "contestorganizer-api",
   "version": "1.0.0",
   "description": "The api to make the Contest Organizer connected",
+  "type": "module",
   "main": "index.php",
   "scripts": {
+    "start": "node ./tools/watch.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "remove_rep": "rm -rf /var/www/marius.click/html/contest/api",
     "create_rep": "mkdir /var/www/marius.click/html/contest/api",
@@ -37,6 +39,7 @@
   },
   "homepage": "https://github.com/MadMartigane/ContestOrganizer-API#readme",
   "devDependencies": {
-    "node-watch": "^0.7.4"
+    "node-watch": "^0.7.4",
+    "php-parser": "^3.1.5"
   }
 }

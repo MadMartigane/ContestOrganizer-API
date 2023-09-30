@@ -6,11 +6,13 @@ require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
 // CONSTANTS
 $CONFIG_FILE = PROJECT_ROOT_PATH . "inc/db_config.json";
 
+error_log(print_r($CONFIG_FILE, true));
+
 // INSTANCES
 $procedures = new Procedures();
 
 class DB {
-    public __constructor() {
+    public function __constructor() {
 
     if (!file_exists($filepath)) {
         return procedures.firstConnection();
