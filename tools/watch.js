@@ -4,7 +4,7 @@ import engine from 'php-parser';
 
 const srcFolder = process.argv[2] || 'src';
 // TODO pass this const as argument.
-const destinationFolder = process.argv[3] || '../../Downloads/test';
+const destinationFolder = process.argv[3] || '/var/www/marius.click/html/contest/api';
 const phpParser = new engine({
     // some options :
     parser: {
@@ -67,3 +67,8 @@ watch(srcFolder, { recursive: true }, function(evt, sourceFileName) {
             break;
     }
 });
+
+setInterval(() => {
+    console.log("still connected…");
+}, 1000 * 60 * 2);
+

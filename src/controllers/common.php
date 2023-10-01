@@ -1,5 +1,8 @@
 <?php
 
+require_once "utils/common.php";
+use utils\common\sanitizeArgument;
+
 class CommonController {
 
     /**
@@ -15,12 +18,7 @@ class CommonController {
      * @return array
      */
     protected function getUriSegments() {
-
-        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        $uri = explode( '/', $uri );
-
-        return $uri;
+        return explode( '/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
     }
 
     /**
@@ -38,7 +36,7 @@ class CommonController {
      * @param mixed $data
      * @param string $httpHeader
      */
-    public function sendOutput($data, $httpHeaders=array()) {
+    public function sendOutput(string $code, $httpHeaders=array()) {
 
         header_remove('Set-Cookie');
 
@@ -48,10 +46,50 @@ class CommonController {
             }
         }
 
-        echo $data;
+        echo $code;
         exit;
     }
 
+    public function getUriSegmentsData() {
+
+        $uri = $this->getUriSegments();
+        $requestSubject = null;
+        $requestAction = null;
+        $requestOption = null;
+        $indexReached = false;
+
+        foreach ($uri as &$value) {
+            if ($value == "index.php") {
+                $indexReached = true;
+                continue;
+            }
+
+            if (!$indexReached) { continue; }
+
+            if (!$requestAction) {
+                $requestAction = utils\common\sanitizeArgument($value);
+                continue;
+            }
+
+            if (!$requestSubject) {
+               $requestSubject = utils\common\sanitizeArgument($value);
+               continue;
+            }
+
+            if (!$requestOption) {
+                $requestOption = utils\common\sanitizeArgument($value);
+                continue;
+            }
+
+        }
+
+        return (object) [
+            "action" => $requestAction,
+            "subject" => $requestSubject,
+            "option" => $requestOption,
+            "uri" => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+        ];
+    }
 }
 
 ?>
