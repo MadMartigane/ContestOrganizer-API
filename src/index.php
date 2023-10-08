@@ -6,27 +6,34 @@ function exeptionHandler(Throwable $ex) {
 
     header_remove('Set-Cookie');
     header("HTTP/1.1 500 Internal Server Error", true);
+    header("Content-Type: application/json;charset=UTF-8");
 
-    echo($ex->__toString());
+    echo(json_encode((object) Array(
+        'error' => $ex->__toString()
+    )));
 }
-
 set_exception_handler('exeptionHandler');
 
 function message(string $log) {
-    echo '<p>' . $log . '</p>';
+    $common = CommonController::getInstance();
+
+    if ($common) {
+        $common->addDebugMessage($log);
+    } else {
+        echo '<p>' . $log . '</p>';
+    }
 }
 
-message('requires…');
 require_once PROJECT_ROOT_PATH . "controllers/common.php";
-require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
-
-message('common…');
-$common = new CommonController();
+$common = CommonController::getInstance(); // Singleton
 $data = $common->getUriSegmentsData();
 
 message('procedures…');
+require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
 $procedures = new Procedures();
 $result = $procedures->getProcedureFromData($data);
 $result->print();
 
 ?>
+
+

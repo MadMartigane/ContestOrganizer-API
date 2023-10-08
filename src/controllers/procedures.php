@@ -6,32 +6,42 @@ require_once PROJECT_ROOT_PATH . 'controllers/common.php';
 
 class Headers {
 
-    private $supportedContentTypes = Array(
-        'application/json'
-    );
+    private $supportedContentTypes;
     private string $contentType;
     private string $http;
-    private $additionnalHeaders = Array();
+    private $additionnalHeaders;
 
 
     public function __construct() {
+        message('__construct new Headers…');
+
+        // TODO SET A SUPPORTED HTTP HEADER LIST
+        $this->supportedContentTypes = Array(
+            'application/json'
+        );
+        $this->additionnalHeaders = Array();
+
         $this->setHttp();
         $this->setContentType();
     }
 
     public function setContentType(string $value = null) {
+        message("setting content type to : " . $value);
         if(in_array($value, $this->supportedContentTypes)) {
             $this->contentType = value;
         } else {
             $this->contentType = array_values($this->supportedContentTypes)[0];
         }
+        message("content type set to : " . $this->contentType);
     }
 
     public function setHttp(string $http = null) {
-        $this->http = $http || '200 OK';
+        $this->http = is_null($http) ? '200 OK' : $http;
+        message("Headers->http set: " . $this->http);
     }
 
     public function toArray() {
+
         if (!$this->contentType) {
             $this->setContentType();
         }
@@ -41,7 +51,7 @@ class Headers {
         }
 
         return array_merge(Array(
-            'Content-Type: ' . $this->contentType,
+            'Content-Type: ' . $this->contentType . ';charset=UTF-8',
             'HTTP/1.1 ' . $this->http
         ), $this->additionnalHeaders);
     }
@@ -52,7 +62,7 @@ class Headers {
 }
 
 class Procedure {
-    // CONSTANTS
+
     private $AVAILABLE_PROCEDURES;
     private $ctrl;
     private $data;
@@ -60,8 +70,9 @@ class Procedure {
     private $type;
 
 
-    public function __construct(string $code, $data) {
+    public function __construct(string $code, object $data) {
 
+        message('__construct() new procedure ' . $code . ' with data: ' . json_encode($data));
         $this->AVAILABLE_PROCEDURES = Array(
             (object) Array(
                 'code' => 'OK',
@@ -95,7 +106,7 @@ class Procedure {
             )
         );
 
-        $this->ctrl = new CommonController();
+        $this->ctrl = CommonController::getInstance();
         $this->headers = new Headers();
         $this->data = $data;
 
@@ -110,7 +121,7 @@ class Procedure {
             }
         }
 
-        foreach ($this->AVAILABLE_PROCEDURE_TYPES as $TYPE) {
+        foreach ($this->AVAILABLE_PROCEDURES as $TYPE) {
             if ($TYPE->isDefault) {
                 $this->type = $TYPE;
                 break;
@@ -128,7 +139,7 @@ class Procedure {
             'error' => null
         );
 
-        if (!$this->data->message && $this->type->defaultMessage) {
+        if (!isset($this->data->message) && $this->type->defaultMessage) {
             $this->data->message = $this->type->defaultMessage;
         }
 
@@ -156,8 +167,10 @@ class Procedures
 
     private function findProcedureFromData($data) {
         $procedureConfig = null;
+        message('call to findProcedureFromData().');
 
         foreach ($this->PROCEDURE_MAPPING as $value) {
+            message('procedure candidate: ' . json_encode($value));
             if ($value->action === $data->action && $value->subject === $data->subject) {
                 $procedureConfig = $value;
                 break;
@@ -171,6 +184,7 @@ class Procedures
         message('call to getProcedureFromData().');
         $procedureConfig = $this->findProcedureFromData($requestData);
 
+        message('found procedure config: ' . json_encode($procedureConfig));
         if (!$procedureConfig) {
             message('procedure NOT found.');
             return $this->error('NOT_FOUND', $requestData);
@@ -179,7 +193,7 @@ class Procedures
         return $this->{$procedureConfig->procedure}($requestData);
     }
 
-    public function error(string $code, $requestData, string $customMessage = null) {
+    public function error(string $code, object $requestData, string $customMessage = null) {
         if ($customMessage) {
             $requestData->message = $customMessage;
         }
@@ -200,10 +214,16 @@ class Procedures
     }
 
     public function listTournament($requestData) {
-        $data = (object) Array(
-            'message' => 'Fake implementation of listTournament().'
+        message('call to listTournament()');
+
+        $data = (object) array_merge(
+            (array) $requestData,
+            Array(
+                'message' => 'Fake implementation of listTournament().'
+            )
         );
 
+        message('new procedure OK with data: ' . json_encode($data));
         return new Procedure('OK', $data);
     }
 }

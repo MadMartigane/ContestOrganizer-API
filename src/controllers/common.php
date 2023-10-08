@@ -5,6 +5,13 @@ use utils\common\sanitizeArgument;
 
 class CommonController {
 
+    private static $instance = null;
+    private array $debugMessages;
+
+    private function __construct() {
+        $this->debugMessages = Array();
+    }
+
     /**
      * __call magic method.
      */
@@ -34,9 +41,9 @@ class CommonController {
      * Send API output.
      *
      * @param mixed $data
-     * @param string $httpHeader
+     * @param array $httpHeaders
      */
-    public function sendOutput(string $code, $httpHeaders=array()) {
+    public function sendOutput(string $code, array $httpHeaders=array()) {
 
         header_remove('Set-Cookie');
 
@@ -46,8 +53,14 @@ class CommonController {
             }
         }
 
+        if (count($this->debugMessages)) {
+            $data = json_decode($code);
+
+            $data->debug = $this->debugMessages;
+            $code = json_encode($data);
+        }
+
         echo $code;
-        exit;
     }
 
     public function getUriSegmentsData() {
@@ -90,6 +103,25 @@ class CommonController {
             "uri" => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
         ];
     }
+
+    public function addDebugMessage(string $message) {
+        array_push($this->debugMessages, $message);
+    }
+
+    public function getDebugMessages() {
+        return $this->debugMessages;
+    }
+
+    // The object is created from within the class itself
+    // only if the class has no instance.
+    public static function getInstance() {
+        if (self::$instance == null) {
+            self::$instance = new CommonController();
+        }
+
+        return self::$instance;
+    }
+
 }
 
 ?>

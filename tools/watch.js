@@ -9,7 +9,7 @@ const phpParser = new engine({
     // some options :
     parser: {
         extractDoc: true,
-        php7: true,
+        php8: true,
     },
     ast: {
         withPositions: true,
