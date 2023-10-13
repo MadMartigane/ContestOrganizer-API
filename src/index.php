@@ -2,6 +2,9 @@
 
 define("PROJECT_ROOT_PATH", __DIR__ . "/");
 
+require_once "utils/common.php";
+use utils\common\sanitizeArgument;
+
 function exeptionHandler(Throwable $ex) {
 
     header_remove('Set-Cookie');
@@ -14,13 +17,15 @@ function exeptionHandler(Throwable $ex) {
 }
 set_exception_handler('exeptionHandler');
 
-function message(string $log) {
+function message(string $log, mixed $thing = '') {
     $common = CommonController::getInstance();
 
+    $additionnalLog = gettype($thing) === 'string' ? $thing : json_encode($thing);
+
     if ($common) {
-        $common->addDebugMessage($log);
+        $common->addDebugMessage($log . $additionnalLog);
     } else {
-        echo '<p>' . $log . '</p>';
+        echo '<p>' . $log . $additionnalLog . '</p>';
     }
 }
 

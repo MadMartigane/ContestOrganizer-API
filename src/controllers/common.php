@@ -1,7 +1,8 @@
 <?php
 
-require_once "utils/common.php";
-use utils\common\sanitizeArgument;
+if (!defined('PROJECT_ROOT_PATH')) {
+    require_once('../utils/403.php');
+}
 
 class CommonController {
 

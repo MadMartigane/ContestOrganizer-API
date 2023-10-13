@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('PROJECT_ROOT_PATH')) {
+    require_once('../utils/403.php');
+}
+
 // REQUIRES
 require_once PROJECT_ROOT_PATH . 'controllers/common.php';
 
@@ -161,6 +165,7 @@ class Procedures
     public function __construct() {
 
         $this->PROCEDURE_MAPPING = Array(
+            (object) Array('action' => 'create', 'subject' => 'config', 'procedure' => 'newConfigTemplate'),
             (object) Array('action' => 'list', 'subject' => 'tournament', 'procedure' => 'listTournament')
         );
     }
@@ -225,6 +230,19 @@ class Procedures
 
         message('new procedure OK with data: ' . json_encode($data));
         return new Procedure('OK', $data);
+    }
+
+    public function newConfigTemplate() {
+        require_once(PROJECT_ROOT_PATH . "utils/template.php");
+
+        $config = new ConfigTemplate();
+        if ($config) {
+            message('$config OK');
+        } else {
+            message('$config KO');
+        }
+
+        return new Procedure('OK', (object) Array('content' => $config->toString()));
     }
 }
 
