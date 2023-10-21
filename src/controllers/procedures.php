@@ -17,7 +17,6 @@ class Headers {
 
 
     public function __construct() {
-        message('__construct new Headers…');
 
         // TODO SET A SUPPORTED HTTP HEADER LIST
         $this->supportedContentTypes = Array(
@@ -30,18 +29,15 @@ class Headers {
     }
 
     public function setContentType(string $value = null) {
-        message("setting content type to : " . $value);
         if(in_array($value, $this->supportedContentTypes)) {
             $this->contentType = value;
         } else {
             $this->contentType = array_values($this->supportedContentTypes)[0];
         }
-        message("content type set to : " . $this->contentType);
     }
 
     public function setHttp(string $http = null) {
         $this->http = is_null($http) ? '200 OK' : $http;
-        message("Headers->http set: " . $this->http);
     }
 
     public function toArray() {
@@ -76,12 +72,18 @@ class Procedure {
 
     public function __construct(string $code, object $data) {
 
-        message('__construct() new procedure ' . $code . ' with data: ' . json_encode($data));
         $this->AVAILABLE_PROCEDURES = Array(
             (object) Array(
                 'code' => 'OK',
                 'type' => 'success',
                 'http' => '200 OK'
+            ),
+            (object) Array(
+                'code' => '500',
+                'type' => 'error',
+                'http' => '500 Internal Server Error',
+                'defaultMessage' => 'Unhandled error.',
+                'isDefault' => true
             ),
             (object) Array(
                 'code' => 'NOT_IMPLEMENTED',
@@ -106,7 +108,7 @@ class Procedure {
                 'code' => 'UNAUTHORIZED',
                 'type' => 'error',
                 'http' => '401 Unauthorized',
-                'defaultMessage' => 'You are not authorized to do this, pleaes loggin first.'
+                'defaultMessage' => 'You are not authorized to do this, please loggin first.'
             )
         );
 
@@ -166,6 +168,7 @@ class Procedures
 
         $this->PROCEDURE_MAPPING = Array(
             (object) Array('action' => 'create', 'subject' => 'config', 'procedure' => 'newConfigTemplate'),
+            (object) Array('action' => 'store', 'subject' => 'tournaments', 'procedure' => 'storeTournaments'),
             (object) Array('action' => 'list', 'subject' => 'tournament', 'procedure' => 'listTournament')
         );
     }
@@ -183,6 +186,62 @@ class Procedures
         }
 
         return $procedureConfig;
+    }
+
+    private function listTournament($requestData) {
+        message('call to listTournament()');
+
+        $data = (object) array_merge(
+            (array) $requestData,
+            Array(
+                'message' => 'Fake implementation of listTournament().'
+            )
+        );
+
+        message('new procedure OK with data: ' . json_encode($data));
+        return new Procedure('OK', $data);
+    }
+
+    private function isValidTournament(mixed $tournament) {
+        if (!$tournament || !$tournament->id || !$tournament->name || !is_array($tournament->grid)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function storeTournaments($requestData) {
+        message('call to storeTournaments()');
+
+        $postData = json_decode(file_get_contents('php://input'), true);
+        $typeofPostData = gettype($postData);
+        message("typeof postData: $typeofPostData");
+        if (!$postData || !is_array($postData)) {
+            message('$postData is not an Array.');
+            return $this->error('NOT_SUPPORTED', $requestData, 'Your posted data is not in supported format.');
+        }
+
+        $tournament1 = (object) array_shift(array_values($postData));
+        message('First tournament: ', $tournament1);
+        if (!$this->isValidTournament($tournament1)) {
+            message('The first element of $postData is not a valid tournament.');
+            return $this->error('NOT_SUPPORTED', $requestData, 'Your posted tournament(s) is not in supported format.');
+        }
+
+        $result = utils\common\saveJsonOnFile($postData, PROJECT_ROOT_PATH . "data/tournaments.json");
+        if ($result->type === 'error') {
+            return $this->error('500', $requestData, $result->message);
+        }
+
+        $data = (object) array_merge(
+            (array) $requestData,
+            Array(
+                'message' => 'Tournaments saved.'
+            )
+        );
+
+        message('new procedure OK with data: ' . json_encode($data));
+        return new Procedure('OK', $data);
     }
 
     public function getProcedureFromData($requestData) {
@@ -216,20 +275,6 @@ class Procedures
 
     public function firstConnection() {
         return $this->todo();
-    }
-
-    public function listTournament($requestData) {
-        message('call to listTournament()');
-
-        $data = (object) array_merge(
-            (array) $requestData,
-            Array(
-                'message' => 'Fake implementation of listTournament().'
-            )
-        );
-
-        message('new procedure OK with data: ' . json_encode($data));
-        return new Procedure('OK', $data);
     }
 
     public function newConfigTemplate() {
