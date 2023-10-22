@@ -5,17 +5,17 @@
   "type": "module",
   "main": "index.php",
   "scripts": {
-    "start": "node ./tools/watch.js",
+    "watch": "node ./tools/watch.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "remove_rep": "rm -rf /var/www/marius.click/html/contest/api",
-    "create_rep": "mkdir /var/www/marius.click/html/contest/api",
-    "copy_files": "npm run copy_index && npm run copy_config && npm run copy_models && npm run copy_controllers && npm run copy_utils",
+    "remove_reps": "rm -rf /var/www/marius.click/html/contest/api/controllers && rm -rf /var/www/marius.click/html/contest/api/models && rm -rf /var/www/marius.click/html/contest/api/utils",
+    "create_rep": "mkdir -p /var/www/marius.click/html/contest/api/data && chown -R fedora:nginx /var/www/marius.click/html/contest/api/data && chmod -R g+w /var/www/marius.click/html/contest/api/data && chcon -R -t httpd_sys_rw_content_t /var/www/marius.click/html/contest/api/data",
+    "copy_files": "npm run copy_index && npm run copy_models && npm run copy_controllers && npm run copy_utils",
     "copy_index": "cp ./src/*.* /var/www/marius.click/html/contest/api/",
-    "copy_config": "cp -r ./src/config /var/www/marius.click/html/contest/api/",
     "copy_models": "cp -r ./src/models /var/www/marius.click/html/contest/api/",
     "copy_controllers": "cp -r ./src/controllers /var/www/marius.click/html/contest/api/",
     "copy_utils": "cp -r ./src/utils /var/www/marius.click/html/contest/api/",
-    "prod": "npm run remove_rep && npm run create_rep && npm run copy_files"
+    "prod": "npm run remove_reps && npm run create_rep && npm run copy_files",
+    "start": "npm run prod && npm run watch"
   },
   "repository": {
     "type": "git",
