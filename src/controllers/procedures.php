@@ -175,10 +175,8 @@ class Procedures
 
     private function findProcedureFromData($data) {
         $procedureConfig = null;
-        message('call to findProcedureFromData().');
 
         foreach ($this->PROCEDURE_MAPPING as $value) {
-            message('procedure candidate: ' . json_encode($value));
             if ($value->action === $data->action && $value->subject === $data->subject) {
                 $procedureConfig = $value;
                 break;
@@ -189,7 +187,6 @@ class Procedures
     }
 
     private function listTournament($requestData) {
-        message('call to listTournament()');
 
         $data = (object) array_merge(
             (array) $requestData,
@@ -198,7 +195,6 @@ class Procedures
             )
         );
 
-        message('new procedure OK with data: ' . json_encode($data));
         return new Procedure('OK', $data);
     }
 
@@ -213,15 +209,13 @@ class Procedures
     private function storeTournaments($requestData) {
         message('call to storeTournaments()');
 
-        $postData = json_decode(file_get_contents('php://input'), true);
-        $typeofPostData = gettype($postData);
-        message("typeof postData: $typeofPostData");
+        $postData = utils\common\getPostData();
+
         if (!$postData || !is_array($postData)) {
-            message('$postData is not an Array.');
             return $this->error('NOT_SUPPORTED', $requestData, 'Your posted data is not in supported format.');
         }
 
-        $tournament1 = (object) array_shift(array_values($postData));
+        $tournament1 = (object) $postData[0];
         message('First tournament: ', $tournament1);
         if (!$this->isValidTournament($tournament1)) {
             message('The first element of $postData is not a valid tournament.');

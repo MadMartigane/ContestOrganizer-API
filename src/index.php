@@ -65,7 +65,6 @@ require_once PROJECT_ROOT_PATH . "controllers/common.php";
 $common = CommonController::getInstance(); // Singleton
 $data = $common->getUriSegmentsData();
 
-message('procedures…');
 require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
 $procedures = new Procedures();
 $result = $procedures->getProcedureFromData($data);

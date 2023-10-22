@@ -29,5 +29,9 @@ function saveJsonOnFile(mixed $json, string $filePath) {
     return (object) Array('type' => 'success', 'message' => "Written bites $written");
 }
 
+function getPostData () {
+    return json_decode(file_get_contents('php://input'), true);
+}
+
 ?>
 
