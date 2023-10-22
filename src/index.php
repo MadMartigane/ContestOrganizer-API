@@ -24,16 +24,13 @@ define('ERROR_SEVERITY_LEVEL', Array(
 require_once "utils/common.php";
 use utils\common\sanitizeArgument;
 
-function globalExeptionHandler(Throwable $ex, $message, $filename, $lineno) {
+function globalExeptionHandler(Throwable $ex) {
 
     header_remove('Set-Cookie');
     header("HTTP/1.1 500 Internal Server Error", true);
     header("Content-Type: application/json;charset=UTF-8");
 
     echo(json_encode((object) Array(
-        'message' => $message,
-        '$filename' => $filename,
-        '$lineno' => $lineno,
         'error' => $ex->__toString()
     )));
 }
@@ -57,7 +54,6 @@ function message(string $log, mixed $thing = '', $severity = 0) {
 function genericErrorHandler($severity, $message, $filename, $lineno) {
     message("$message on $filename. Line $lineno", null, $severity);
 }
-
 set_error_handler('genericErrorHandler');
 
 

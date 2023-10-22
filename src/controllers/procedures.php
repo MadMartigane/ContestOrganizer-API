@@ -70,7 +70,7 @@ class Procedure {
     private $type;
 
 
-    public function __construct(string $code, object $data) {
+    public function __construct(string $code, array|object $data) {
 
         $this->AVAILABLE_PROCEDURES = Array(
             (object) Array(
@@ -145,7 +145,7 @@ class Procedure {
             'error' => null
         );
 
-        if (!isset($this->data->message) && $this->type->defaultMessage) {
+        if (!isset($this->data->message) && isset($this->type->defaultMessage)) {
             $this->data->message = $this->type->defaultMessage;
         }
 
@@ -169,7 +169,7 @@ class Procedures
         $this->PROCEDURE_MAPPING = Array(
             (object) Array('action' => 'create', 'subject' => 'config', 'procedure' => 'newConfigTemplate'),
             (object) Array('action' => 'store', 'subject' => 'tournaments', 'procedure' => 'storeTournaments'),
-            (object) Array('action' => 'list', 'subject' => 'tournament', 'procedure' => 'listTournament')
+            (object) Array('action' => 'list', 'subject' => 'tournaments', 'procedure' => 'listTournaments')
         );
     }
 
@@ -184,18 +184,6 @@ class Procedures
         }
 
         return $procedureConfig;
-    }
-
-    private function listTournament($requestData) {
-
-        $data = (object) array_merge(
-            (array) $requestData,
-            Array(
-                'message' => 'Fake implementation of listTournament().'
-            )
-        );
-
-        return new Procedure('OK', $data);
     }
 
     private function isValidTournament(mixed $tournament) {
@@ -238,20 +226,20 @@ class Procedures
         return new Procedure('OK', $data);
     }
 
-    public function getProcedureFromData($requestData) {
-        message('call to getProcedureFromData().');
-        $procedureConfig = $this->findProcedureFromData($requestData);
-
-        message('found procedure config: ' . json_encode($procedureConfig));
-        if (!$procedureConfig) {
-            message('procedure NOT found.');
-            return $this->error('NOT_FOUND', $requestData);
+    private function listTournaments($requestData) {
+        if ($requestData->option) {
+            return $this->error('NOT_SUPPORTED', $requestData);
         }
 
-        return $this->{$procedureConfig->procedure}($requestData);
+        $result = utils\common\readJsonFromFile(PROJECT_ROOT_PATH . "data/tournaments.json");
+        if ($result->type === 'error') {
+            return $this->error('500', $requestData, $result->message);
+        }
+
+        return new Procedure('OK', $result->data);
     }
 
-    public function error(string $code, object $requestData, string $customMessage = null) {
+    private function error(string $code, object $requestData, string $customMessage = null) {
         if ($customMessage) {
             $requestData->message = $customMessage;
         }
@@ -259,19 +247,19 @@ class Procedures
         return new Procedure($code, $requestData,);
     }
 
-    public function todo() {
+    private function todo() {
         return new Procedure('TODO', (object) Array(message => 'This feature is not yet implemented.' ));
     }
 
-    public function ok($requestData) {
+    private function ok($requestData) {
         return new Procedure('OK', $requestData);
     }
 
-    public function firstConnection() {
+    private function firstConnection() {
         return $this->todo();
     }
 
-    public function newConfigTemplate() {
+    private function newConfigTemplate() {
         require_once(PROJECT_ROOT_PATH . "utils/template.php");
 
         $config = new ConfigTemplate();
@@ -283,6 +271,25 @@ class Procedures
 
         return new Procedure('OK', (object) Array('content' => $config->toString()));
     }
+
+    public function getProcedureFromData($requestData) {
+        message('call to getProcedureFromData().');
+        $procedureConfig = $this->findProcedureFromData($requestData);
+
+        message('found procedure config: ', $procedureConfig);
+        if (!$procedureConfig) {
+            message('procedure NOT found.');
+            return $this->error('NOT_FOUND', $requestData);
+        }
+
+        if(!method_exists($this, $procedureConfig->procedure)) {
+            message('procedure NOT configured.');
+            return $this->error('NOT_IMPLEMENTED', $requestData, "Procedure is not well configured.");
+        }
+
+        return $this->{$procedureConfig->procedure}($requestData);
+    }
+
 }
 
 ?>

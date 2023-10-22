@@ -21,12 +21,26 @@ class CommonController {
     }
 
     /**
+     * Get URI raw.
+     *
+     * @return string
+     */
+    protected function getUri() {
+        if (!isset($_SERVER) || !isset($_SERVER['REQUEST_URI'])) {
+            return null;
+        }
+
+        return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    }
+
+
+    /**
      * Get URI elements.
      *
      * @return array
      */
     protected function getUriSegments() {
-        return explode( '/', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+        return explode( '/', $this->getUri());
     }
 
     /**
@@ -35,6 +49,10 @@ class CommonController {
      * @return array
      */
     protected function getQueryStringParams() {
+        if (!isset($_SERVER) || !isset($_SERVER['QUERY_STRING'])) {
+            return null;
+        }
+
         return parse_str($_SERVER['QUERY_STRING'], $query);
     }
 
@@ -101,7 +119,7 @@ class CommonController {
             "action" => $requestAction,
             "subject" => $requestSubject,
             "option" => $requestOption,
-            "uri" => parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH),
+            "uri" => $this->getUri(),
         ];
     }
 

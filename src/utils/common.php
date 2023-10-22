@@ -29,6 +29,18 @@ function saveJsonOnFile(mixed $json, string $filePath) {
     return (object) Array('type' => 'success', 'message' => "Written bites $written");
 }
 
+function readJsonFromFile(string $filePath) {
+    message("Read file $filePath");
+    $content = file_get_contents($filePath);
+
+    if (!$content) {
+        return (object) Array('type' => 'error', 'message' => "Unable to read file $filePath");
+    }
+
+    return (object) Array('type' => 'success', 'data' => json_decode($content));
+}
+
+
 function getPostData () {
     return json_decode(file_get_contents('php://input'), true);
 }
