@@ -14,7 +14,12 @@
     "copy_models": "cp -r ./src/models /var/www/marius.click/html/contest/api/",
     "copy_controllers": "cp -r ./src/controllers /var/www/marius.click/html/contest/api/",
     "copy_utils": "cp -r ./src/utils /var/www/marius.click/html/contest/api/",
-    "prod": "npm run remove_reps && npm run create_rep && npm run copy_files",
+    "backup-api-data": "cp -r /var/www/marius.click/html/contest/api/data/* ~/backup/tounament-data/",
+    "restore-api-data": "cp -r ~/backup/tounament-data/* /var/www/marius.click/html/contest/api/data/",
+    "restore-api-group": "chown -R fedora:nginx /var/www/marius.click/html/contest/api/data",
+    "restore-api-rights-grw": "chmod -R g+rw /var/www/marius.click/html/contest/api/data/*",
+    "restore-data": "npm run restore-api-data && npm run restore-api-group && npm run restore-api-rights-grw",
+    "prod": "npm run backup-api-data && npm run remove_reps && npm run create_rep && npm run copy_files && npm run restore-data",
     "start": "npm run prod && npm run watch"
   },
   "repository": {

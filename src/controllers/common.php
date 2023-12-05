@@ -65,6 +65,7 @@ class CommonController {
     public function sendOutput(string $code, array $httpHeaders=array()) {
 
         header_remove('Set-Cookie');
+        header('Access-Control-Allow-Origin: *');
 
         if (is_array($httpHeaders) && count($httpHeaders)) {
             foreach ($httpHeaders as $httpHeader) {

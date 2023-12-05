@@ -199,11 +199,12 @@ class Procedures
 
         $postData = utils\common\getPostData();
 
-        if (!$postData || !is_array($postData)) {
+        if (!$postData || !isset($postData['timestamp']) || !isset($postData['tournaments'])) {
+            message('call to NOT_SUPPORTED: "Your posted data is not in supported format."');
             return $this->error('NOT_SUPPORTED', $requestData, 'Your posted data is not in supported format.');
         }
 
-        $tournament1 = (object) $postData[0];
+        $tournament1 = (object) $postData['tournaments'][0];
         message('First tournament: ', $tournament1);
         if (!$this->isValidTournament($tournament1)) {
             message('The first element of $postData is not a valid tournament.');
@@ -239,7 +240,11 @@ class Procedures
         return new Procedure('OK', $result->data);
     }
 
-    private function error(string $code, object $requestData, string $customMessage = null) {
+    private function error(string $code, object $requestData = null, string $customMessage = null) {
+        if (!isset($requestData)) {
+            $requestData = (object) Array();
+        }
+
         if ($customMessage) {
             $requestData->message = $customMessage;
         }
