@@ -7,6 +7,7 @@
   "scripts": {
     "watch": "node ./tools/watch.js",
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< Updated upstream
     "remove_reps": "rm -rf /var/www/marius.click/html/contest/api/controllers && rm -rf /var/www/marius.click/html/contest/api/models && rm -rf /var/www/marius.click/html/contest/api/utils",
     "create_rep": "mkdir -p /var/www/marius.click/html/contest/api/data && chown -R fedora:nginx /var/www/marius.click/html/contest/api/data && chmod -R g+w /var/www/marius.click/html/contest/api/data && chcon -R -t httpd_sys_rw_content_t /var/www/marius.click/html/contest/api/data",
     "copy_files": "npm run copy_index && npm run copy_models && npm run copy_controllers && npm run copy_utils",
@@ -21,6 +22,26 @@
     "restore-data": "npm run restore-api-data && npm run restore-api-group && npm run restore-api-rights-grw",
     "prod": "npm run backup-api-data && npm run remove_reps && npm run create_rep && npm run copy_files && npm run restore-data",
     "start": "npm run prod && npm run watch"
+=======
+    "remove_rep": "rm -rf /var/www/marius.click/html/contest/api",
+    "create_rep": "mkdir /var/www/marius.click/html/contest/api",
+    "copy_files": "npm run copy_index && npm run copy_config && npm run copy_models && npm run copy_controllers && npm run copy_utils",
+    "copy_index": "cp ./src/index.php /var/www/marius.click/html/contest/api/",
+    "copy_config": "cp -r ./src/config /var/www/marius.click/html/contest/api/",
+    "copy_models": "cp -r ./src/models /var/www/marius.click/html/contest/api/",
+    "copy_controllers": "cp -r ./src/controllers /var/www/marius.click/html/contest/api/",
+    "copy_utils": "cp -r ./src/utils /var/www/marius.click/html/contest/api/",
+    "prod": "npm run remove_rep && npm run create_rep && npm run copy_files",
+    "remove_rep_preprod": "rm -rf /var/www/marius.click/html/contest-preprod/api",
+    "create_rep_preprod": "mkdir /var/www/marius.click/html/contest-preprod/api",
+    "copy_index_preprod": "cp ./src/index.php /var/www/marius.click/html/contest-preprod/api/",
+    "copy_config_preprod": "cp -r ./src/config /var/www/marius.click/html/contest-preprod/api/",
+    "copy_models_preprod": "cp -r ./src/models /var/www/marius.click/html/contest-preprod/api/",
+    "copy_controllers_preprod": "cp -r ./src/controllers /var/www/marius.click/html/contest-preprod/api/",
+    "copy_utils_preprod": "cp -r ./src/utils /var/www/marius.click/html/contest-preprod/api/",
+    "copy_files_preprod": "npm run copy_index_preprod && npm run copy_config_preprod && npm run copy_models_preprod && npm run copy_controllers_preprod && npm run copy_utils_preprod",
+    "pre-prod": "npm run remove_rep_preprod && npm run create_rep_preprod && npm run copy_files_preprod"
+>>>>>>> Stashed changes
   },
   "repository": {
     "type": "git",
