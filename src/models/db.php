@@ -1,5 +1,10 @@
 <?php
 
+if (!defined('PROJECT_ROOT_PATH')) {
+    require_once('../utils/404.php');
+}
+
+
 // REQUIRES
 require_once PROJECT_ROOT_PATH . "controllers/procedures.php";
 
