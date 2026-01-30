@@ -108,7 +108,7 @@ A PHP-based API for managing sports contests (basketball, soccer, etc.). It uses
 
 ## 10. Deployment Notes
 - The project is designed to be deployed directly to a Linux/Nginx environment.
-- Deployment scripts in `package.json` handle file permissions (`chown`, `chmod`) and SELinux contexts (`chcon`).
+- Deployment scripts in `package.json` handle file permissions (`chown`, `chmod`).
 - **Warning**: Do not modify deployment paths in `package.json` without explicit instruction.
 - **Syncing**: Use `npm run prod` to synchronize the `src` directory with the live server path.
 

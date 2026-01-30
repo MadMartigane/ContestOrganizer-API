@@ -45,10 +45,7 @@ fi
 
 # 6. Set permissions (requires appropriate rights)
 echo "Setting permissions..."
-chown -R fedora:nginx "$DEST/data" || echo "Warning: Could not change owner. Run with sudo if needed."
+chown -R debian:www-data "$DEST/data" || echo "Warning: Could not change owner. Run with sudo if needed."
 chmod -R g+w "$DEST/data" || echo "Warning: Could not change permissions. Run with sudo if needed."
-if command -v chcon >/dev/null 2>&1; then
-    chcon -R -t httpd_sys_rw_content_t "$DEST/data" || echo "Warning: Could not set SELinux context."
-fi
 
 echo "Deployment to $TARGET completed successfully!"
