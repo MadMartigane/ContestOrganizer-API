@@ -1,5 +1,6 @@
 {
     "require": {
-        "nikic/php-parser": "^4.17"
+        "nikic/php-parser": "^4.17",
+        "firebase/php-jwt": "^7.0"
     }
 }

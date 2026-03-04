@@ -6,6 +6,11 @@ if (!defined('PROJECT_ROOT_PATH')) {
 
 // REQUIRES
 require_once PROJECT_ROOT_PATH . 'controllers/common.php';
+require_once PROJECT_ROOT_PATH . 'services/JwtService.php';
+require_once PROJECT_ROOT_PATH . 'middleware/AuthMiddleware.php';
+require_once PROJECT_ROOT_PATH . 'controllers/AuthController.php';
+require_once PROJECT_ROOT_PATH . 'controllers/FileController.php';
+require_once PROJECT_ROOT_PATH . 'controllers/UserController.php';
 
 
 class Headers {
@@ -30,7 +35,7 @@ class Headers {
 
     public function setContentType(string $value = null) {
         if(in_array($value, $this->supportedContentTypes)) {
-            $this->contentType = value;
+            $this->contentType = $value;
         } else {
             $this->contentType = array_values($this->supportedContentTypes)[0];
         }
@@ -169,7 +174,17 @@ class Procedures
         $this->PROCEDURE_MAPPING = Array(
             (object) Array('action' => 'create', 'subject' => 'config', 'procedure' => 'newConfigTemplate'),
             (object) Array('action' => 'store', 'subject' => 'tournaments', 'procedure' => 'storeTournaments'),
-            (object) Array('action' => 'list', 'subject' => 'tournaments', 'procedure' => 'listTournaments')
+            (object) Array('action' => 'list', 'subject' => 'tournaments', 'procedure' => 'listTournaments'),
+            (object) Array('action' => 'auth', 'subject' => 'login', 'procedure' => 'authLogin'),
+            (object) Array('action' => 'auth', 'subject' => 'logout', 'procedure' => 'authLogout'),
+            (object) Array('action' => 'files', 'subject' => 'list', 'procedure' => 'listFiles'),
+            (object) Array('action' => 'files', 'subject' => 'get', 'procedure' => 'getFile'),
+            (object) Array('action' => 'files', 'subject' => 'create', 'procedure' => 'createFile'),
+            (object) Array('action' => 'files', 'subject' => 'update', 'procedure' => 'updateFile'),
+            (object) Array('action' => 'files', 'subject' => 'delete', 'procedure' => 'deleteFile'),
+            (object) Array('action' => 'users', 'subject' => 'create', 'procedure' => 'createUser'),
+            (object) Array('action' => 'users', 'subject' => 'list', 'procedure' => 'listUsers'),
+            (object) Array('action' => 'users', 'subject' => 'delete', 'procedure' => 'deleteUser')
         );
     }
 
@@ -275,6 +290,60 @@ class Procedures
         }
 
         return new Procedure('OK', (object) Array('content' => $config->toString()));
+    }
+
+    private function authLogin($requestData) {
+        $controller = new AuthController();
+        $controller->login();
+    }
+
+    private function authLogout($requestData) {
+        $controller = new AuthController();
+        $controller->logout();
+    }
+
+    private function listFiles($requestData) {
+        $controller = new FileController();
+        $controller->listFiles();
+    }
+
+    private function getFile($requestData) {
+        $controller = new FileController();
+        $fileId = isset($requestData->option) ? (int) $requestData->option : 0;
+        $controller->getFile($fileId);
+    }
+
+    private function createFile($requestData) {
+        $controller = new FileController();
+        $controller->createFile();
+    }
+
+    private function updateFile($requestData) {
+        $controller = new FileController();
+        $fileId = isset($requestData->option) ? (int) $requestData->option : 0;
+        $controller->updateFile($fileId);
+    }
+
+    private function deleteFile($requestData) {
+        $controller = new FileController();
+        $fileId = isset($requestData->option) ? (int) $requestData->option : 0;
+        $controller->deleteFile($fileId);
+    }
+
+    private function createUser($requestData) {
+        $controller = new UserController();
+        $controller->createUser();
+    }
+
+    private function listUsers($requestData) {
+        $controller = new UserController();
+        $controller->listUsers();
+    }
+
+    private function deleteUser($requestData) {
+        $controller = new UserController();
+        $userId = isset($requestData->option) ? (int) $requestData->option : 0;
+        $controller->deleteUser($userId);
     }
 
     public function getProcedureFromData($requestData) {
