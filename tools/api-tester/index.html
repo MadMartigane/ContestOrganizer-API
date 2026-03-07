@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester | Developer Console</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Overlay (Mobile) -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="ph ph-code"></i>
+                    </div>
+                    <span class="logo-text">API Tester</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Authentication</div>
+                    <a class="nav-item active" data-section="auth">
+                        <i class="ph ph-sign-in"></i>
+                        <span>Login</span>
+                    </a>
+                    <a class="nav-item" data-section="jwt">
+                        <i class="ph ph-key"></i>
+                        <span>JWT Info</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Data</div>
+                    <a class="nav-item" data-section="users">
+                        <i class="ph ph-users"></i>
+                        <span>Users</span>
+                    </a>
+                    <a class="nav-item" data-section="files">
+                        <i class="ph ph-folder-open"></i>
+                        <span>Files</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a class="nav-item" data-section="request">
+                        <i class="ph ph-paper-plane-tilt"></i>
+                        <span>Request</span>
+                    </a>
+                    <a class="nav-item" data-section="response">
+                        <i class="ph ph-chat-text"></i>
+                        <span>Response</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <!-- Sidebar Footer -->
+            <div style="padding: var(--space-md); border-top: 1px solid var(--border-color);">
+                <div class="nav-item" style="margin: 0; cursor: default;">
+                    <i class="ph ph-terminal"></i>
+                    <span style="font-family: var(--font-mono); font-size: 0.75rem;">v1.0.0</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menu-toggle">
+                        <i class="ph ph-list"></i>
+                    </button>
+                    <h1 class="header-title">Developer Console</h1>
+                    <div class="api-url-config">
+                        <label for="api-base-url">API Base:</label>
+                        <input type="url" id="api-base-url" class="api-url-input" value="http://localhost/contest/api/index.php" placeholder="https://api.example.com">
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <div class="status-indicator disconnected" id="connection-status">
+                        <span class="status-dot"></span>
+                        <span id="connection-status-text">Disconnected</span>
+                    </div>
+                    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                        <i class="ph ph-moon"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Main Body -->
+            <div class="main-body">
+                <!-- Authentication Panel -->
+                <section class="panel auth-section" id="auth-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-sign-in"></i>
+                            Authentication
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form id="login-form" class="auth-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="login-email" class="form-label">Email Address</label>
+                                    <input type="email" id="login-email" name="email" class="form-input" placeholder="user@example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="login-password" class="form-label">Password</label>
+                                    <input type="password" id="login-password" name="password" class="form-input" placeholder="Enter your password" required>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: var(--space-md);">
+                                <button type="button" id="login-submit-btn" class="btn btn-primary btn-lg btn-block">
+                                    <i class="ph ph-sign-in"></i>
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div id="login-error" class="alert alert-error hidden"></div>
+                        
+                        <button id="logout-btn" class="btn btn-danger hidden" style="margin-top: var(--space-md);">
+                            <i class="ph ph-sign-out"></i>
+                            Logout
+                        </button>
+                        
+                        <div id="token-display" class="token-display hidden">
+                            <div class="token-section">
+                                <h4>Access Token</h4>
+                                <pre class="token-content" id="access-token"></pre>
+                            </div>
+                            <div class="token-section">
+                                <h4>Refresh Token</h4>
+                                <pre class="token-content" id="refresh-token"></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- JWT Info Panel -->
+                <section class="panel" id="jwt-panel" style="display: none;">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-key"></i>
+                            JWT Token Information
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div id="jwt-decoded" class="jwt-decoded hidden">
+                            <dl class="jwt-fields">
+                                <div class="jwt-field">
+                                    <dt>Subject (sub)</dt>
+                                    <dd id="jwt-sub">-</dd>
+                                </div>
+                                <div class="jwt-field">
+                                    <dt>Role</dt>
+                                    <dd id="jwt-role">-</dd>
+                                </div>
+                                <div class="jwt-field">
+                                    <dt>Issued At (iat)</dt>
+                                    <dd id="jwt-iat">-</dd>
+                                </div>
+                                <div class="jwt-field">
+                                    <dt>Expires (exp)</dt>
+                                    <dd id="jwt-exp">-</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div id="jwt-placeholder" class="empty-state">
+                            <i class="ph ph-key" style="font-size: 2rem; color: var(--text-muted);"></i>
+                            <p>Login to view JWT information</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Users Panel -->
+                <section class="panel users-section hidden" id="users-section">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-users"></i>
+                            Users Management
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="users-actions" style="margin-bottom: var(--space-lg);">
+                            <button id="list-users-btn" class="btn btn-primary">
+                                <i class="ph ph-list"></i>
+                                List Users
+                            </button>
+                        </div>
+                        
+                        <form id="create-user-form" class="create-user-form" style="margin-bottom: var(--space-lg);">
+                            <h3 style="font-size: 0.9375rem; margin-bottom: var(--space-md); color: var(--text-secondary);">
+                                <i class="ph ph-user-plus"></i>
+                                Create New User
+                            </h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="new-user-email" class="form-label">Email</label>
+                                    <input type="email" id="new-user-email" name="email" class="form-input" placeholder="user@example.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-user-password" class="form-label">Password</label>
+                                    <input type="password" id="new-user-password" name="password" class="form-input" placeholder="Enter password" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-user-role" class="form-label">Role</label>
+                                    <select id="new-user-role" name="role" class="form-select" required>
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="margin-top: var(--space-md);">
+                                <i class="ph ph-plus"></i>
+                                Create User
+                            </button>
+                        </form>
+                    </div>
+                </section>
+                
+                <!-- Files Panel -->
+                <section class="panel files-section" id="files-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-folder-open"></i>
+                            Files Management
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="files-actions" style="margin-bottom: var(--space-lg);">
+                            <button id="list-files-btn" class="btn btn-primary">
+                                <i class="ph ph-folder-simple"></i>
+                                List Files
+                            </button>
+                        </div>
+                        
+                        <form id="create-file-form" class="create-file-form" style="margin-bottom: var(--space-lg);">
+                            <h3 style="font-size: 0.9375rem; margin-bottom: var(--space-md); color: var(--text-secondary);">
+                                <i class="ph ph-file-plus"></i>
+                                Create New File
+                            </h3>
+                            <div class="form-group">
+                                <label for="new-file-name" class="form-label">Filename</label>
+                                <input type="text" id="new-file-name" name="filename" class="form-input" placeholder="data.json" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-file-content" class="form-label">Content (JSON)</label>
+                                <div class="editor-area">
+                                    <div class="mac-dot red"></div>
+                                    <div class="mac-dot yellow"></div>
+                                    <div class="mac-dot green"></div>
+                                    <textarea id="new-file-content" name="content" class="form-textarea" placeholder='{"key": "value"}' required></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="ph ph-plus"></i>
+                                Create File
+                            </button>
+                        </form>
+                        
+                        <div id="file-list" class="file-list"></div>
+                        
+                        <div id="file-actions" class="file-actions hidden" style="margin-top: var(--space-lg);">
+                            <form id="update-file-form" class="update-file-form">
+                                <h3 style="font-size: 0.9375rem; margin-bottom: var(--space-md); color: var(--text-secondary);">
+                                    <i class="ph ph-pencil-simple"></i>
+                                    Update File
+                                </h3>
+                                <input type="hidden" id="update-file-id" name="id">
+                                <div class="form-group">
+                                    <label for="update-file-content" class="form-label">New Content (JSON)</label>
+                                    <div class="editor-area">
+                                        <div class="mac-dot red"></div>
+                                        <div class="mac-dot yellow"></div>
+                                        <div class="mac-dot green"></div>
+                                        <textarea id="update-file-content" name="content" class="form-textarea" placeholder='{"key": "value"}' required></textarea>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ph ph-floppy-disk"></i>
+                                    Save Changes
+                                </button>
+                            </form>
+                            <button id="delete-file-btn" class="btn btn-danger" style="margin-top: var(--space-md);">
+                                <i class="ph ph-trash"></i>
+                                Delete Selected File
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Raw Request Panel -->
+                <section class="panel raw-request-section" id="raw-request-section">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-paper-plane-tilt"></i>
+                            Raw Request
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form id="raw-request-form" class="raw-request-form">
+                            <div class="request-config">
+                                <div class="form-group">
+                                    <label for="request-method" class="form-label">Method</label>
+                                    <select id="request-method" name="method" class="form-select" required>
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                        <option value="PUT">PUT</option>
+                                        <option value="DELETE">DELETE</option>
+                                        <option value="PATCH">PATCH</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="request-url" class="form-label">URL Endpoint</label>
+                                    <input type="text" id="request-url" name="url" class="form-input" placeholder="/endpoint/path" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" id="request-body-group">
+                                <label for="request-body" class="form-label">Request Body (JSON)</label>
+                                <div class="editor-area">
+                                    <div class="mac-dot red"></div>
+                                    <div class="mac-dot yellow"></div>
+                                    <div class="mac-dot green"></div>
+                                    <textarea id="request-body" name="body" class="form-textarea" placeholder='{"key": "value"}'></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="custom-headers-section">
+                                <div class="headers-header">
+                                    <h4>Custom Headers</h4>
+                                    <button type="button" id="add-header-btn" class="btn btn-secondary btn-sm">
+                                        <i class="ph ph-plus"></i>
+                                        Add Header
+                                    </button>
+                                </div>
+                                <div id="custom-headers-container"></div>
+                            </div>
+                            
+                            <button type="submit" id="send-request-btn" class="btn btn-primary btn-lg btn-block">
+                                <i class="ph ph-paper-plane-tilt"></i>
+                                Send Request
+                            </button>
+                        </form>
+                    </div>
+                </section>
+                
+                <!-- Response Panel -->
+                <section class="panel response-panel" id="response-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="ph ph-chat-text"></i>
+                            Response
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="response-meta">
+                            <div class="response-status">
+                                <span>Status:</span>
+                                <span id="response-status" class="status-badge">-</span>
+                            </div>
+                            <div class="response-time">
+                                <span>Duration:</span>
+                                <span id="response-time">-</span>
+                            </div>
+                            <button id="copy-response-btn" class="copy-btn">
+                                <i class="ph ph-copy"></i>
+                                Copy
+                            </button>
+                        </div>
+                        
+                        <div class="response-headers">
+                            <h3>
+                                <i class="ph ph-info"></i>
+                                Headers
+                            </h3>
+                            <pre id="response-headers"><span class="placeholder">No headers</span></pre>
+                        </div>
+                        
+                        <div class="response-body">
+                            <h3>
+                                <i class="ph ph-code"></i>
+                                Body
+                            </h3>
+                            <pre id="response-body"><span class="placeholder">No response yet</span></pre>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Floating Action Button (Mobile Quick Actions) -->
+    <button class="fab" id="fab" title="Quick Actions">
+        <i class="ph ph-lightning"></i>
+    </button>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

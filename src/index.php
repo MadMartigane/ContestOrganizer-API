@@ -1,6 +1,29 @@
 <?php
 
+// CORS Headers - Allow requests from any origin
+cors();
+
 define('PROJECT_ROOT_PATH', __DIR__ . '/');
+
+function cors() {
+    // Allow from any origin
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Credentials: true");
+    }
+
+    // Access-Control headers are received during OPTIONS requests
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+            header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+        }
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        }
+        // Exit after sending headers for OPTIONS request
+        exit(0);
+    }
+}
 define('ERROR_SEVERITY_LEVEL', Array(
     0 => "DEBUG",
     E_ERROR => "ERROR",
